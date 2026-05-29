@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>노트 패드 순서 정렬기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 마우스 오버 시 들리는 효과를 제거한 깔끔한 일반 리스트 스타일 */
+    .line-item {
+      transition: background-color 0.15s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f7f7f7] text-neutral-800 font-sans antialiased p-4 md:p-8 flex flex-col justify-center items-center">
+
+  <!-- Unified Main Container (Single Window Style) -->
+  <div class="max-w-6xl w-full bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+    
+    <!-- Dark Integrated Header (Mimicking the uploaded image reference) -->
+    <div class="bg-[#292929] text-white p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">노트 패드 생성기</h1>
+        <p class="text-xs text-neutral-400 mt-1">원하는 문장을 정렬하고 조합하여 웹 커뮤니용 스타일 코드를 만듭니다.</p>
+      </div>
+    </div>
+
+    <!-- Main Workspace Split Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 border-t border-neutral-200">
+      
+      <!-- LEFT COLUMN: Inputs & Customization (Sections 1 & 2) -->
+      <div class="md:col-span-5 p-6 flex flex-col gap-6 border-b md:border-b-0 md:border-r border-neutral-200">
+        
+        <!-- Section 1: Design Settings -->
+        <div class="flex flex-col gap-3">
+          <h2 class="text-sm font-bold text-[#292929] uppercase tracking-wider flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#292929] text-white text-[11px] font-mono">1</span>
+            디자인 설정
+          </h2>
+          
+          <div class="grid grid-cols-2 gap-3 text-xs mt-1">
+            <div>
+              <label class="block text-neutral-500 mb-1 font-medium">세로선 색상</label>
+              <div class="flex items-center gap-2 border border-neutral-200 rounded-lg p-2 bg-neutral-50 focus-within:border-neutral-400">
+                <input type="color" id="lineColor" value="#ff8a8a" class="w-5 h-5 border-0 rounded cursor-pointer bg-transparent">
+                <input type="text" id="lineColorText" value="#ff8a8a" class="w-full bg-transparent border-0 focus:ring-0 p-0 uppercase text-center font-mono">
+              </div>
+            </div>
+            <div>
+              <label class="block text-neutral-500 mb-1 font-medium">가로밑줄 색상</label>
+              <div class="flex items-center gap-2 border border-neutral-200 rounded-lg p-2 bg-neutral-50 focus-within:border-neutral-400">
+                <input type="color" id="underlineColor" value="#edf2f7" class="w-5 h-5 border-0 rounded cursor-pointer bg-transparent">
+                <input type="text" id="underlineColorText" value="#edf2f7" class="w-full bg-transparent border-0 focus:ring-0 p-0 uppercase text-center font-mono">
+              </div>
+            </div>
+            <div>
+              <label class="block text-neutral-500 mb-1 font-medium">글자 색상</label>
+              <div class="flex items-center gap-2 border border-neutral-200 rounded-lg p-2 bg-neutral-50 focus-within:border-neutral-400">
+                <input type="color" id="textColor" value="#2D4248" class="w-5 h-5 border-0 rounded cursor-pointer bg-transparent">
+                <input type="text" id="textColorText" value="#2D4248" class="w-full bg-transparent border-0 focus:ring-0 p-0 uppercase text-center font-mono">
+              </div>
+            </div>
+            <div>
+              <label class="block text-neutral-500 mb-1 font-medium">배경 색상</label>
+              <div class="flex items-center gap-2 border border-neutral-200 rounded-lg p-2 bg-neutral-50 focus-within:border-neutral-400">
+                <input type="color" id="bgColor" value="#ffffff" class="w-5 h-5 border-0 rounded cursor-pointer bg-transparent">
+                <input type="text" id="bgColorText" value="#ffffff" class="w-full bg-transparent border-0 focus:ring-0 p-0 uppercase text-center font-mono">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-neutral-100" />
+
+        <!-- Section 2: Lines Management -->
+        <div class="flex flex-col gap-3 flex-grow">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-[#292929] uppercase tracking-wider flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#292929] text-white text-[11px] font-mono">2</span>
+              줄 관리
+            </h2>
+            <button id="addLineBtn" class="text-xs bg-[#292929] hover:bg-neutral-800 text-white font-medium py-1.5 px-3 rounded transition-colors">
+              새 줄 추가
+            </button>
+          </div>
+          
+          <div id="inputsContainer" class="flex flex-col gap-3 overflow-y-auto max-h-[380px] pr-1 mt-1">
+            <!-- Dynamic items load here -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Preview & Code Output (Sections 3 & 4) -->
+      <div class="md:col-span-7 p-6 bg-neutral-50 flex flex-col gap-6">
+        
+        <!-- Section 3: Live Preview -->
+        <div class="flex flex-col gap-3">
+          <h2 class="text-sm font-bold text-[#292929] uppercase tracking-wider flex items-center gap-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#292929] text-white text-[11px] font-mono">3</span>
+            실시간 미리보기
+          </h2>
+          <div class="p-6 bg-white rounded-lg border border-neutral-200 min-h-[140px] flex items-center justify-center mt-1">
+            <div id="previewArea" class="w-full"></div>
+          </div>
+        </div>
+
+        <hr class="border-neutral-200" />
+
+        <!-- Section 4: Code Output -->
+        <div class="flex flex-col gap-3 flex-grow">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-[#292929] uppercase tracking-wider flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#292929] text-white text-[11px] font-mono">4</span>
+              복사 코드 생성
+            </h2>
+            <button id="copyBtn" class="bg-[#292929] hover:bg-neutral-800 active:scale-95 text-white text-xs font-medium py-1.5 px-4 rounded transition-all">
+              코드 복사
+            </button>
+          </div>
+          <div class="relative flex-grow mt-1">
+            <textarea id="codeResult" readonly class="w-full h-48 md:h-full min-h-[150px] p-4 bg-[#1e1e1e] text-neutral-200 font-mono text-[11px] leading-relaxed rounded-lg border border-neutral-300 focus:ring-0 focus:outline-none resize-none select-all"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#292929] text-white text-xs px-4 py-2.5 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <span id="toastMsg">코드가 복사되었습니다!</span>
+  </div>
+
+  <script>
+    let lines = [
+      "첫번째",
+      "두번째",
+      "세번째"
+    ];
+
+    const inputsContainer = document.getElementById('inputsContainer');
+    const addLineBtn = document.getElementById('addLineBtn');
+    const previewArea = document.getElementById('previewArea');
+    const codeResult = document.getElementById('codeResult');
+    const copyBtn = document.getElementById('copyBtn');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+
+    const colorInputs = {
+      line: { p: document.getElementById('lineColor'), t: document.getElementById('lineColorText') },
+      under: { p: document.getElementById('underlineColor'), t: document.getElementById('underlineColorText') },
+      text: { p: document.getElementById('textColor'), t: document.getElementById('textColorText') },
+      bg: { p: document.getElementById('bgColor'), t: document.getElementById('bgColorText') }
+    };
+
+    Object.values(colorInputs).forEach(obj => {
+      obj.p.addEventListener('input', (e) => { obj.t.value = e.target.value.toUpperCase(); updateAll(); });
+      obj.t.addEventListener('input', (e) => {
+        let v = e.target.value; if (!v.startsWith('#')) v = '#' + v;
+        if (/^#[0-9A-F]{6}$/i.test(v)) { obj.p.value = v; updateAll(); }
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', () => { renderInputs(); updateAll(); });
+
+    function renderInputs() {
+      inputsContainer.innerHTML = '';
+      lines.forEach((text, idx) => {
+        const item = document.createElement('div');
+        item.className = 'line-item flex items-center gap-2 bg-neutral-50 p-2.5 rounded border border-neutral-200';
+        
+        // Reorder Buttons Group (Black & White style)
+        const reorderGroup = document.createElement('div');
+        reorderGroup.className = 'flex flex-col gap-1';
+        
+        const upBtn = createActionBtn(`<svg viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clip-rule="evenodd" /></svg>`, 
+          () => moveLine(idx, -1), idx === 0);
+        
+        const downBtn = createActionBtn(`<svg viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>`, 
+          () => moveLine(idx, 1), idx === lines.length - 1);
+
+        reorderGroup.appendChild(upBtn);
+        reorderGroup.appendChild(downBtn);
+
+        const textarea = document.createElement('textarea');
+        textarea.className = 'flex-grow text-xs p-2 bg-white border border-neutral-200 rounded focus:border-neutral-400 focus:outline-none resize-none h-12';
+        textarea.value = text;
+        textarea.oninput = (e) => { lines[idx] = e.target.value; updateAll(); };
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'p-1.5 text-neutral-400 hover:text-[#292929] transition-colors';
+        delBtn.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75V4H5a1 1 0 000 2h10a1 1 0 100-2h-1v-.25A2.75 2.75 0 0011.25 1h-2.5zM10 13a1 1 0 100-2 1 1 0 000 2zM7 13a1 1 0 100-2 1 1 0 000 2zM13 13a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /><path d="M4 7v10.25A2.75 2.75 0 006.75 20h6.5A2.75 2.75 0 0016 17.25V7H4z" /></svg>`;
+        delBtn.onclick = () => { if(lines.length > 1) { lines.splice(idx,1); renderInputs(); updateAll(); } };
+
+        item.appendChild(reorderGroup);
+        item.appendChild(textarea);
+        item.appendChild(delBtn);
+        inputsContainer.appendChild(item);
+      });
+    }
+
+    function createActionBtn(html, onclick, disabled) {
+      const b = document.createElement('button');
+      b.className = `p-1 rounded bg-white border border-neutral-200 text-neutral-400 transition-all ${disabled ? 'opacity-25 cursor-not-allowed' : 'hover:border-neutral-400 hover:text-[#292929] active:scale-95'}`;
+      b.innerHTML = html;
+      if(!disabled) b.onclick = onclick;
+      return b;
+    }
+
+    function moveLine(index, direction) {
+      const newIdx = index + direction;
+      if (newIdx < 0 || newIdx >= lines.length) return;
+      [lines[index], lines[newIdx]] = [lines[newIdx], lines[index]];
+      renderInputs();
+      updateAll();
+    }
+
+    addLineBtn.onclick = () => { lines.push(""); renderInputs(); updateAll(); inputsContainer.scrollTop = inputsContainer.scrollHeight; };
+
+    function shrinkHex(h) {
+      h = h.trim();
+      if (h.length === 7 && h[1]===h[2] && h[3]===h[4] && h[5]===h[6]) return '#' + h[1] + h[3] + h[5];
+      return h;
+    }
+
+    function updateAll() {
+      const cL = shrinkHex(colorInputs.line.p.value);
+      const cU = shrinkHex(colorInputs.under.p.value);
+      const cT = shrinkHex(colorInputs.text.p.value);
+      const cB = shrinkHex(colorInputs.bg.p.value);
+
+      let html = `<div style="position:relative;background:${cB};color:${cT};font-size:14px;border:1px solid #e2e8f0;border-radius:5px;margin-bottom:5px;overflow:hidden;"><div style="position:absolute;left:40px;top:0;bottom:0;width:2px;background:${cL};"></div>`;
+      
+      lines.forEach((t, i) => {
+        const isL = i === lines.length - 1;
+        const bS = isL ? "" : `border-bottom:1px solid ${cU};`;
+        html += `<div style="${bS}padding:${i===0?'20px':'5px'} 10px ${isL?'20px':'5px'} 55px;">${t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`;
+      });
+
+      html += `</div>`;
+      previewArea.innerHTML = html;
+      codeResult.value = html;
+    }
+
+    copyBtn.onclick = () => {
+      codeResult.select();
+      try {
+        if(document.execCommand('copy')) showToast("코드가 복사되었습니다!");
+      } catch(e) { showToast("복사 실패", true); }
+    };
+
+    function showToast(m, err) {
+      toastMsg.innerText = m;
+      toast.classList.remove('opacity-0', 'translate-y-20');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => { toast.classList.remove('opacity-100', 'translate-y-0'); toast.classList.add('opacity-0', 'translate-y-20'); }, 2000);
+    }
+  </script>
+</body>
+</html>
